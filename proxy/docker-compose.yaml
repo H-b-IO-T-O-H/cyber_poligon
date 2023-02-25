@@ -1,0 +1,38 @@
+version: "3.6"
+
+services:
+  proxy:
+    build: .
+    image: nginx:latest
+    command: tail -f >> /dev/null
+    container_name: proxy
+    ports:
+      - "80:80"
+    networks:
+      - host
+      # private
+      - net_1
+      - net_2
+
+  cont_1:
+    build: ../userdata/1/
+    container_name: container_1
+    networks:
+      - net_1
+
+  cont_2:
+    build: ../userdata/2/
+    container_name: container_2
+    networks:
+      - net_2
+
+networks:
+  host:
+  # приватные сети, которые создаются на каждый контейнер в userdata
+  net_1:
+    name: my_private_network_1
+    driver: bridge
+  net_2:
+    name: my_private_network_2
+    driver: bridge
+
