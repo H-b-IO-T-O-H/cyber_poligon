@@ -32,7 +32,15 @@ networks:
   net_1:
     name: my_private_network_1
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1
   net_2:
     name: my_private_network_2
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.11.0/24
+          gateway: 10.10.11.1
 
