@@ -5,8 +5,8 @@ services:
     image: nginx:stable
     #command: tail -f >> /dev/null
     container_name: proxy
-    ports:
-      - "8080:80" # внешний <- внутренний
+#    ports:
+#      - "8080:80" # внешний <- внутренний
     restart: unless-stopped
     networks:
       exported_net:
