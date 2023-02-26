@@ -7,7 +7,8 @@ services:
     command: tail -f >> /dev/null
     container_name: proxy
     ports:
-      - "80:80"
+      - "8080:80"
+      - "443:443"
     networks:
       - host
       # private
@@ -28,6 +29,7 @@ services:
 
 networks:
   host:
+    external: true
   # приватные сети, которые создаются на каждый контейнер в userdata
   net_1:
     name: my_private_network_1
