@@ -6,9 +6,9 @@ services:
     image: nginx:latest
     command: tail -f >> /dev/null
     container_name: proxy
-#    ports:
-#      - "8080:80"
-#      - "443:443"
+    ports:
+      - "8080:80"
+      - "443:443"
     networks:
       exported_net:
         ipv4_address: 10.10.0.2
