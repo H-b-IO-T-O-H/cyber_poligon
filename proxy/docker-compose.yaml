@@ -6,14 +6,15 @@ services:
     image: nginx:latest
     command: tail -f >> /dev/null
     container_name: proxy
-    ports:
-      - "8080:80"
-      - "443:443"
+#    ports:
+#      - "8080:80"
+#      - "443:443"
     networks:
-      - host
+      exported_net:
+        ipv4_address: 10.10.0.2
       # private
-      - net_1
-      - net_2
+      net_1:
+      net_2:
 
   cont_1:
     build: ../userdata/1/
@@ -28,9 +29,14 @@ services:
       - net_2
 
 networks:
-  host:
-    external: true
-  # приватные сети, которые создаются на каждый контейнер в userdata
+  exported_net:
+    name: exported_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.0.0/30
+          gateway: 10.10.0.1
+   #приватные сети, которые создаются на каждый контейнер в userdata
   net_1:
     name: my_private_network_1
     driver: bridge
