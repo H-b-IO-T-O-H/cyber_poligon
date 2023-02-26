@@ -2,16 +2,16 @@ version: "3.6"
 
 services:
   proxy:
-    build: .
-    image: nginx:latest
-    command: tail -f >> /dev/null
+    image: nginx:stable
+    #command: tail -f >> /dev/null
     container_name: proxy
     ports:
-      - "8080:80"
+      - "8080:80" # внешний <- внутренний
+    restart: unless-stopped
     networks:
       exported_net:
         ipv4_address: 10.10.0.2
-      # private
+       # private
       net_1:
       net_2:
 
