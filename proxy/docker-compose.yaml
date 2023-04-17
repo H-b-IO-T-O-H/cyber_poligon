@@ -1,53 +1,109 @@
 version: "3.6"
 
 services:
-  proxy:
+
+  # vpn - external adapter for proxy-container
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SERVERURL=wireguard.domain.com #optional
+      - SERVERPORT=51820 #optional
+      - PEERS=5 #optional
+      - PEERDNS=auto #optional
+      - INTERNAL_SUBNET=10.13.13.0 #optional
+      #- ALLOWEDIPS=0.0.0.0/0 #optional
+      - SERVER_ALLOWEDIPS_PEER_1=10.13.13.101
+      - SERVER_ALLOWEDIPS_PEER_2=10.13.13.102
+      - PERSISTENTKEEPALIVE_PEERS= #optional
+      - LOG_CONFS=true #optional
+    volumes:
+      - ./config:/config
+      #- /lib/modules:/lib/modules #optional
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+
+  # container for peer1
+  cont_1:
+    build: .
     image: nginx:stable
-    #command: tail -f >> /dev/null
-    container_name: proxy
-#    ports:
-#      - "8080:80" # внешний <- внутренний
+    volumes:
+      - ./data/cont_1.html:/usr/share/nginx/html/index.html
+    container_name: cont_1
+    ports:
+      - "8081:80" # внешний <- внутренний
     restart: unless-stopped
     networks:
-      exported_net:
-        ipv4_address: 10.10.0.2
-       # private
       net_1:
-      net_2:
+        ipv4_address: 10.13.13.2
 
-  cont_1:
-    build: ../userdata/1/
-    container_name: container_1
-    networks:
-      - net_1
-
+  #container for peer2
   cont_2:
-    build: ../userdata/2/
-    container_name: container_2
+    build: .
+    image: nginx:stable
+    container_name: cont_2
+    volumes:
+      - ./data/cont_2.html:/usr/share/nginx/html/index.html
+    ports:
+      - "8082:80" # внешний <- внутренний
+    restart: unless-stopped
     networks:
-      - net_2
+      net_1:
+        ipv4_address: 10.13.13.3
+
+#  proxy:
+#    build: .
+#    image: nginx:stable
+#    container_name: proxy
+#    ports:
+#      - "8080:80" # внешний <- внутренний
+#    restart: unless-stopped
+
+#  cont_1:
+#    build: ../userdata/1/
+#    container_name: container_1
+#    networks:
+#      - net_1
+#
+#  cont_2:
+#    build: ../userdata/2/
+#    container_name: container_2
+#    networks:
+#      - net_2
+
+#networks:
+#  #приватные сети, которые создаются на каждый контейнер
+#  net_1:
+#    name: my_private_network_1
+#    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: 10.13.13.0/24
+#          gateway: 10.13.1.1
+#          aux_addresses:
+#            cont_1: 10.13.13.2
+#            cont_2: 10.13.13.3
+##  net_2:
+#    name: my_private_network_2
+#    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: 10.13.14.2/30
+#          #gateway: 10.13.13.255
 
 networks:
-  exported_net:
-    name: exported_net
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.10.0.0/30
-          gateway: 10.10.0.1
-   #приватные сети, которые создаются на каждый контейнер в userdata
   net_1:
     name: my_private_network_1
-    driver: bridge
     ipam:
+      driver: default
       config:
-        - subnet: 10.10.10.0/24
-          gateway: 10.10.10.1
-  net_2:
-    name: my_private_network_2
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.10.11.0/24
-          gateway: 10.10.11.1
-
+        - subnet: 10.13.13.0/24
