@@ -2,14 +2,14 @@ version: "3.6"
 
 services:
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    ports:
-      - "9443:9443"
-    volumes:
-      - ./portainer_data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+#  portainer:
+#    image: portainer/portainer-ce:latest
+#    ports:
+#      - "9443:9443"
+#    volumes:
+#      - ./portainer_data:/data
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    restart: unless-stopped
 
   # vpn providers pool. ports mapping for external containers
 
@@ -33,39 +33,56 @@ services:
       - LOG_CONFS=true #optional
     volumes:
       - ./config1:/config
-    ports:
-      - "51821:51821/udp"
-      - "8081:80"
+    networks:
+      default:
+        ipv4_address: 172.20.0.50
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
 
-  # vpn2 - external adapter for proxy-container
-  wireguard2:
-    image: lscr.io/linuxserver/wireguard:latest
-    container_name: wireguard2
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - SERVERURL=185.68.21.231
-      - SERVERPORT=51821
-      - PEERS=2
-      - PEERDNS=auto #optional
-      - INTERNAL_SUBNET=10.1.2.0 #optional
-      - PERSISTENTKEEPALIVE_PEERS= #optional
-      - LOG_CONFS=true #optional
+
+  cont_1:
+    build: .
+    image: nginx:stable
+    container_name: cont_1
     volumes:
-      - ./config2:/config
+      - ./data/cont_1.html:/usr/share/nginx/html/index.html
     ports:
-      - "51822:51822/udp"
-      - "8082:80"
-      - "8989:3306"
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
+      - "8081:80" # внешний <- внутренний
     restart: unless-stopped
+
+
+networks:
+  default:
+    name: wgnet_1
+    external: true
+
+#  # vpn2 - external adapter for proxy-container
+#  wireguard2:
+#    image: lscr.io/linuxserver/wireguard:latest
+#    container_name: wireguard2
+#    cap_add:
+#      - NET_ADMIN
+#      - SYS_MODULE
+#    environment:
+#      - PUID=1000
+#      - PGID=1000
+#      - TZ=Etc/UTC
+#      - SERVERURL=185.68.21.231
+#      - SERVERPORT=51821
+#      - PEERS=2
+#      - PEERDNS=auto #optional
+#      - INTERNAL_SUBNET=10.1.2.0 #optional
+#      - PERSISTENTKEEPALIVE_PEERS= #optional
+#      - LOG_CONFS=true #optional
+#    volumes:
+#      - ./config2:/config
+#    ports:
+#      - "51822:51822/udp"
+#      - "8082:80"
+#      - "8989:3306"
+#    sysctls:
+#      - net.ipv4.conf.all.src_valid_mark=1
+#    restart: unless-stopped
 
 
