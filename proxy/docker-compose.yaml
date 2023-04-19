@@ -11,6 +11,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
+  # vpn providers pool. ports mapping for external containers
+
   # vpn1 - external adapter for proxy-container
   wireguard1:
     image: lscr.io/linuxserver/wireguard:latest
@@ -31,25 +33,12 @@ services:
       - LOG_CONFS=true #optional
     volumes:
       - ./config1:/config
-      #- /lib/modules:/lib/modules #optional
     ports:
-      - 51821:51821/udp
-      - 8081:80
+      - "51821:51821/udp"
+      - "8081:80"
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
-
-  # container for peer1
-  cont_1:
-    build: .
-    image: nginx:stable
-    volumes:
-      - ./data/cont_1.html:/usr/share/nginx/html/index.html
-    container_name: cont_1
-#    ports:
-#      - "8081:80" # внешний <- внутренний
-    restart: unless-stopped
-    network_mode: service:wireguard1
 
   # vpn2 - external adapter for proxy-container
   wireguard2:
@@ -71,22 +60,12 @@ services:
       - LOG_CONFS=true #optional
     volumes:
       - ./config2:/config
-      #- /lib/modules:/lib/modules #optional
     ports:
-      - 51822:51822/udp
-      - 8082:80
+      - "51822:51822/udp"
+      - "8082:80"
+      - "8989:3306"
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
 
-  # container for peer2
-  cont_2:
-    build: .
-    image: nginx:stable
-    volumes:
-      - ./data/cont_2.html:/usr/share/nginx/html/index.html
-    container_name: cont_2
-#    ports:
-#      - "8081:80" # внешний <- внутренний
-    restart: unless-stopped
-    network_mode: service:wireguard2
+
