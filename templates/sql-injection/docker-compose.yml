@@ -6,21 +6,21 @@ services:
       - db
     volumes:
       - ./code/sqli-labs:/var/www/html
-    network_mode: container:wireguard2
+    #network_mode: container:wireguard2
     environment:
       MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_HOST: ${MYSQL_HOST}
       MYSQL_DBNAME: ${MYSQL_DBNAME}
       MYSQL_DBNAME1: ${MYSQL_DBNAME1}
-#    ports:
-#      - "8081:80"
+    ports:
+      - "8080:80"
 
-  db:
-    platform: linux/x86_64
-    image: mysql:5.7.6
-#    ports:
-#      - "8989:3306"
-    network_mode: container:wireguard2
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+#  db:
+#    platform: linux/x86_64
+#    image: mysql:5.7.6
+##    ports:
+##      - "8989:3306"
+#    network_mode: container:wireguard2
+#    environment:
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
