@@ -18,14 +18,15 @@ services:
     networks:
       - default
 
-#  db:
-#    platform: linux/x86_64
-#    image: mysql:5.7.6
-##    ports:
-##      - "8989:3306"
-#    network_mode: container:wireguard2
-#    environment:
-#      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7.6
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8989:3306"
+    networks:
+      - default
 
 networks:
   default:
