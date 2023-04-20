@@ -25,14 +25,16 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
       - SERVERURL=185.68.21.231
-      - SERVERPORT=51821
-      - PEERS=2
+      - SERVERPORT=51820
+      - PEERS=1
       - PEERDNS=auto #optional
       - INTERNAL_SUBNET=10.1.1.0 #optional
       - PERSISTENTKEEPALIVE_PEERS= #optional
       - LOG_CONFS=true #optional
     volumes:
       - ./config1:/config
+    ports:
+      - "51820:51820/udp"
     networks:
       default:
         ipv4_address: 172.20.0.50
@@ -41,15 +43,15 @@ services:
     restart: unless-stopped
 
 
-  cont_1:
-    build: .
-    image: nginx:stable
-    container_name: cont_1
-    volumes:
-      - ./data/cont_1.html:/usr/share/nginx/html/index.html
-    ports:
-      - "8081:80" # внешний <- внутренний
-    restart: unless-stopped
+#  cont_1:
+#    build: .
+#    image: nginx:stable
+#    container_name: cont_1
+#    volumes:
+#      - ./data/cont_1.html:/usr/share/nginx/html/index.html
+#    ports:
+#      - "8081:80" # внешний <- внутренний
+#    restart: unless-stopped
 
 
 networks:
